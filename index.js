@@ -94,7 +94,7 @@ var asciify_core = function(path, opts, callback) {
       for (i = 0; i < image.bitmap.width; i++) {       // width
         for (c = 0; c < options.c_ratio; c++) {   // character ratio
 
-          var next = chars.charAt(Math.round(intensity(image, i, j) / norm));
+          var next = chars.charAt(Math.round(intensity(image, i, j, opts.color) / norm));
 
           // Color character using
           if (options.color) {
@@ -170,7 +170,8 @@ var calculate_dims = function (img, opts) {
 
 /**
  * Calculates the "intensity" at a point (x, y) in the image, (0, 0) being the
- *   top left corner of the image. Linear combination of rgb_weights with RGB
+ *   top left corner of the image. The intensity is calculated using the default black/white 
+ *   combination of rgb_weights with RGB
  *   values at the specified point.
  *
  * @param [Image] i - The image object
@@ -179,7 +180,23 @@ var calculate_dims = function (img, opts) {
  *
  * @returns [int] An int in [0, 1020] representing the intensity of the pixel
  */
-var intensity = function (i, x, y) {
-  var color = Jimp.intToRGBA(i.getPixelColor(x, y));
-  return color.r + color.g + color.b + color.a;
+var intensity = function (i, x, y, color = true) {
+  var colors = Jimp.intToRGBA(i.getPixelColor(x, y));
+
+  if (color) {
+    return colors.r + colors.g + colors.b + colors.a;
+  }
+
+  // Use sigmoid to increate contrast
+  function sigmoid1(input) {
+    return 1 / (1 + Math.exp(-input/35));
+  }
+
+  const bw = {
+    r: sigmoid1(colors.r - 128) * 255 * .2126 * 4,
+    g: sigmoid1(colors.g - 128) * 255 * .7152 * 4,
+    b: sigmoid1(colors.b - 128) * 255 * .0722 * 4
+  }
+
+  return bw.r + bw.g + bw.b;
 }
