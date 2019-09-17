@@ -50,7 +50,7 @@ module.exports = function (path, second, third) {
 var asciify_core = function(path, opts, callback) {
   // First open image to get initial properties
   Jimp.read(path, function(err, image) {
-    if (err) return callback('Error loading image: ' + err);
+    if (err || !image) return callback('Error loading image: ' + err);
 
     // Percentage based widths
     if (opts.width && opts.width.toString().substr(-1) === '%') {
