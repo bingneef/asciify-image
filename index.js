@@ -7,7 +7,7 @@ var Jimp = require('jimp'),
 
 // Set of basic characters ordered by increasing "darkness"
 // Used as pixels in the ASCII image
-var chars = ' .,:;i1tfLCG08@',
+var chars = '`.,:;i1tfLCG08@',
     num_c = chars.length - 1;
 
 module.exports = function (path, second, third) {
